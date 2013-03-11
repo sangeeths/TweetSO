@@ -21,7 +21,7 @@ class Twitter:
         self._url = 'https://api.twitter.com/1/statuses/update.json'
         self.configure(handle)
     def configure(self, handle): 
-        self._config_file = '%s/.%src' % (os.environ['HOME'], handle)
+        self._config_file = '%s/.%s' % (os.environ['HOME'], handle)
         if not os.path.exists(self._config_file):
             raise EConfigFileNotFound
         config = {}

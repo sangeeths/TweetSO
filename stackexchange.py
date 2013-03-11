@@ -63,6 +63,11 @@ class StackExchange:
         result = self._request(self._get_url(url, **kwargs))
         return self._to_tinyurl(result)
         
+    def get_featured_questions(self, **kwargs):
+        url = self._base_url + '/questions/featured?'
+        result = self._request(self._get_url(url, **kwargs))
+        return self._to_tinyurl(result)
+
 if __name__ == '__main__':
     se = StackExchange()
     print se.get_unanswered_questions(pagesize=10, site='stackoverflow', tagged='javascript', fromdate=1362096000, todate=1362873600)
