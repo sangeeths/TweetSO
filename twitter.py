@@ -30,7 +30,7 @@ class Twitter:
                 if not line.startswith("#"):
                     (key, val) = line.split(':')
                     config[str(key.strip())] = str(val.strip().strip('\n'))
-        # print "Twitter: configure: config: %s" % config
+        #print "Twitter: configure: config: %s" % config
         if 'access_token_key' not in config:
             raise EConfigParameterNotFound('access_token_key is missing')
         if 'access_token_secret' not in config:
@@ -74,6 +74,6 @@ class Twitter:
         t_opener.close()
 
 if __name__ == '__main__':
-    t = Twitter('CStackOverflow')
+    t = Twitter('HadoopSO')
     t.tweet("this is a sample tweet message!!")
 

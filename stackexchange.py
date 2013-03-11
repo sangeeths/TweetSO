@@ -39,6 +39,9 @@ class StackExchange:
         return result
 
     def _get_url(self, url, **kwargs):
+        # Hack! 
+        if kwargs['tagged'] == 'c#':
+            kwargs['tagged'] = 'c%23'
         url += 'page=%d&'     % self._page     if 'page'     not in kwargs else 'page=%d&'     % kwargs['page']
         url += 'pagesize=%d&' % self._pagesize if 'pagesize' not in kwargs else 'pagesize=%d&' % kwargs['pagesize']
         if 'fromdate' in kwargs: url += 'fromdate=%d&' % kwargs['fromdate']
@@ -71,6 +74,7 @@ class StackExchange:
 if __name__ == '__main__':
     se = StackExchange()
     print se.get_unanswered_questions(pagesize=10, site='stackoverflow', tagged='javascript', fromdate=1362096000, todate=1362873600)
+    #print se.get_unanswered_questions(tagged='c#')
 #    print se.get_noanswered_questions(page=2, fromdate=1362096000, todate=1362873600)
 #    print se.get_unanswered_questions()
 #    print se.get_noanswered_questions()

@@ -22,7 +22,7 @@ def _log(func, q):
 @scheduler.cron_schedule(hour='0,4,8,12,16,20')
 def TweetUnAnsweredCQuestions():
     (t, s) = _get_handlers('CStackOverflow')
-    questions = se.get_unanswered_questions(tagged='c')
+    questions = s.get_unanswered_questions(tagged='c')
     for q in questions:
         t.tweet("[unanswered] %110s - %s" % (q['title'], q['link']))
     _log(inspect.stack()[0][3], len(questions))
@@ -38,7 +38,7 @@ def TweetFeaturedCQuestions():
 @scheduler.cron_schedule(hour='1,5,9,13,17,21')
 def TweetUnAnsweredCppQuestions():
     (t, s) = _get_handlers('CppSO')
-    questions = se.get_unanswered_questions(tagged='cpp')
+    questions = s.get_unanswered_questions(tagged='c++')
     for q in questions:
         t.tweet("[unanswered] %110s - %s" % (q['title'], q['link']))
     _log(inspect.stack()[0][3], len(questions))
@@ -46,23 +46,25 @@ def TweetUnAnsweredCppQuestions():
 @scheduler.cron_schedule(hour='1,5,9,13,17,21')
 def TweetFeaturedCppQuestions():
     (t, s) = _get_handlers('CppSO')
-    questions = se.get_featured_questions(tagged='cpp')
+    questions = s.get_featured_questions(tagged='c++')
     for q in questions:
         t.tweet("[featured] %110s - %s" % (q['title'], q['link']))
     _log(inspect.stack()[0][3], len(questions))
 
-@scheduler.cron_schedule(hour='2,6,10,14,18,22')
+#@scheduler.cron_schedule(hour='2,6,10,14,18,22', minute='35')
 def TweetUnAnsweredCSharpQuestions():
-    (t, s) = _get_handlers('CSharpSO')
-    questions = se.get_unanswered_questions(tagged='c#')
+    t = Twitter('CSharpSO')
+    s = StackExchange()
+    questions = s.get_unanswered_questions(tagged='c#')
     for q in questions:
-        t.tweet("[unanswered] %110s - %s" % (q['title'], q['link']))
+        print q
+        t.tweet("[unanswered] %100s - %s" % (q['title'], q['link']))
     _log(inspect.stack()[0][3], len(questions))
 
-@scheduler.cron_schedule(hour='2,6,10,14,18,22')
+#@scheduler.cron_schedule(hour='2,6,10,14,18,22', minute='35')
 def TweetFeaturedCSharpQuestions():
     (t, s) = _get_handlers('CSharpSO')
-    questions = se.get_featured_questions(tagged='c#')
+    questions = s.get_featured_questions(tagged='c#')
     for q in questions:
         t.tweet("[featured] %110s - %s" % (q['title'], q['link']))
     _log(inspect.stack()[0][3], len(questions))
@@ -70,7 +72,7 @@ def TweetFeaturedCSharpQuestions():
 @scheduler.cron_schedule(hour='3,7,11,15,19,23')
 def TweetUnAnsweredHadoopQuestions():
     (t, s) = _get_handlers('HadoopSO')
-    questions = se.get_unanswered_questions(tagged='hadoop')
+    questions = s.get_unanswered_questions(tagged='hadoop')
     for q in questions:
         t.tweet("[unanswered] %110s - %s" % (q['title'], q['link']))
     _log(inspect.stack()[0][3], len(questions))
@@ -78,7 +80,7 @@ def TweetUnAnsweredHadoopQuestions():
 @scheduler.cron_schedule(hour='3,7,11,15,19,23')
 def TweetFeaturedHadoopQuestions():
     (t, s) = _get_handlers('HadoopSO')
-    questions = se.get_featured_questions(tagged='hadoop')
+    questions = s.get_featured_questions(tagged='hadoop')
     for q in questions:
         t.tweet("[featured] %110s - %s" % (q['title'], q['link']))
     _log(inspect.stack()[0][3], len(questions))
@@ -86,7 +88,7 @@ def TweetFeaturedHadoopQuestions():
 @scheduler.cron_schedule(hour='4,8,12,16,20,24')
 def TweetUnAnsweredJavaScriptQuestions():
     (t, s) = _get_handlers('SOJavaScript')
-    questions = se.get_unanswered_questions(tagged='javascript')
+    questions = s.get_unanswered_questions(tagged='javascript')
     for q in questions:
         t.tweet("[unanswered] %110s - %s" % (q['title'], q['link']))
     _log(inspect.stack()[0][3], len(questions))
@@ -94,7 +96,7 @@ def TweetUnAnsweredJavaScriptQuestions():
 @scheduler.cron_schedule(hour='4,8,12,16,20,24')
 def TweetFeaturedJavaScriptQuestions():
     (t, s) = _get_handlers('SOJavaScript')
-    questions = se.get_featured_questions(tagged='javascript')
+    questions = s.get_featured_questions(tagged='javascript')
     for q in questions:
         t.tweet("[featured] %110s - %s" % (q['title'], q['link']))
     _log(inspect.stack()[0][3], len(questions))
