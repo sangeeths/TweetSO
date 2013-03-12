@@ -1,11 +1,10 @@
-from twitter import Twitter
-from stackexchange import StackExchange
-
+from apscheduler.scheduler import Scheduler
 from datetime import datetime
 import inspect
 import logging
 
-from apscheduler.scheduler import Scheduler
+from stackexchange import StackExchange
+from twitter import Twitter
 
 logging.basicConfig(filename='/tmp/TweetSO.log', 
                     level=logging.DEBUG, 
@@ -13,94 +12,85 @@ logging.basicConfig(filename='/tmp/TweetSO.log',
 
 scheduler = Scheduler(standalone=True)
 
-def _get_handlers(op):
-    return (Twitter(op), StackExchange())
-
-def _log(func, q):
-    logging.info("%s : tweeted %d questions" % (func, q))
+def _tweet(handle, questions, prefix=None):
+    _title_max = 100
+    if handle is None:
+        logging.error("No twitter handle!!")
+        return -1
+    t = Twitter(handle)
+    for q in questions:
+        status = ""
+        if prefix is not None:
+            status += "[%s] " % prefix
+        if len(q['title']) > _title_max:
+            status += "%s... " % q['title'][0:_title_max]
+        else:
+            status += "%s " % q['title']
+        status += q['link']
+        t.tweet(status)
+    logging.info("%s tweeted %d questions [prefix=%s]" % \
+                (handle, len(questions), prefix))
+    return len(questions)
 
 @scheduler.cron_schedule(hour='0,4,8,12,16,20')
 def TweetUnAnsweredCQuestions():
-    (t, s) = _get_handlers('CStackOverflow')
+    s = StackExchange()
     questions = s.get_unanswered_questions(tagged='c')
-    for q in questions:
-        t.tweet("[unanswered] %110s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
-    
+    _tweet('CStackOverflow', questions, 'unanswered')
+
 @scheduler.cron_schedule(hour='0,4,8,12,16,20')
 def TweetFeaturedCQuestions():
-    (t, s) = _get_handlers('CStackOverflow')
+    s = StackExchange()
     questions = s.get_featured_questions(tagged='c')
-    for q in questions:
-        t.tweet("[featured] %110s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
+    _tweet('CStackOverflow', questions, 'featured')
 
 @scheduler.cron_schedule(hour='1,5,9,13,17,21')
 def TweetUnAnsweredCppQuestions():
-    (t, s) = _get_handlers('CppSO')
+    s = StackExchange()
     questions = s.get_unanswered_questions(tagged='c++')
-    for q in questions:
-        t.tweet("[unanswered] %110s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
+    _tweet('CppSO', questions, 'unanswered')
 
 @scheduler.cron_schedule(hour='1,5,9,13,17,21')
 def TweetFeaturedCppQuestions():
-    (t, s) = _get_handlers('CppSO')
+    s = StackExchange()
     questions = s.get_featured_questions(tagged='c++')
-    for q in questions:
-        t.tweet("[featured] %110s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
+    _tweet('CppSO', questions, 'featured')
 
-#@scheduler.cron_schedule(hour='2,6,10,14,18,22', minute='35')
+@scheduler.cron_schedule(hour='2,6,10,14,18,22', minute='35')
 def TweetUnAnsweredCSharpQuestions():
-    t = Twitter('CSharpSO')
     s = StackExchange()
     questions = s.get_unanswered_questions(tagged='c#')
-    for q in questions:
-        print q
-        t.tweet("[unanswered] %100s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
+    _tweet('CSharpSO', questions, 'unanswered')
 
-#@scheduler.cron_schedule(hour='2,6,10,14,18,22', minute='35')
+@scheduler.cron_schedule(hour='2,6,10,14,18,22', minute='35')
 def TweetFeaturedCSharpQuestions():
-    (t, s) = _get_handlers('CSharpSO')
+    s = StackExchange()
     questions = s.get_featured_questions(tagged='c#')
-    for q in questions:
-        t.tweet("[featured] %110s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
+    _tweet('CSharpSO', questions, 'featured')
 
-@scheduler.cron_schedule(hour='3,7,11,15,19,23')
+@scheduler.cron_schedule(hour='3,7,11,15,19,23', minute='6')
 def TweetUnAnsweredHadoopQuestions():
-    (t, s) = _get_handlers('HadoopSO')
+    s = StackExchange()
     questions = s.get_unanswered_questions(tagged='hadoop')
-    for q in questions:
-        t.tweet("[unanswered] %110s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
+    _tweet('HadoopSO', questions, 'unanswered')
 
-@scheduler.cron_schedule(hour='3,7,11,15,19,23')
+@scheduler.cron_schedule(hour='3,7,11,15,19,23', minute='6')
 def TweetFeaturedHadoopQuestions():
-    (t, s) = _get_handlers('HadoopSO')
+    s = StackExchange()
     questions = s.get_featured_questions(tagged='hadoop')
-    for q in questions:
-        t.tweet("[featured] %110s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
+    _tweet('HadoopSO', questions, 'featured')
 
 @scheduler.cron_schedule(hour='4,8,12,16,20,24')
 def TweetUnAnsweredJavaScriptQuestions():
-    (t, s) = _get_handlers('SOJavaScript')
+    s = StackExchange()
     questions = s.get_unanswered_questions(tagged='javascript')
-    for q in questions:
-        t.tweet("[unanswered] %110s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
+    _tweet('SOJavaScript', questions, 'unanswered')
 
 @scheduler.cron_schedule(hour='4,8,12,16,20,24')
 def TweetFeaturedJavaScriptQuestions():
-    (t, s) = _get_handlers('SOJavaScript')
+    s = StackExchange()
     questions = s.get_featured_questions(tagged='javascript')
-    for q in questions:
-        t.tweet("[featured] %110s - %s" % (q['title'], q['link']))
-    _log(inspect.stack()[0][3], len(questions))
-
+    _tweet('SOJavaScript', questions, 'featured')
 
 
 print('Press Ctrl+C to exit')

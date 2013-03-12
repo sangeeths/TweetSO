@@ -66,7 +66,7 @@ class Twitter:
     def tweet(self, status):
         t_request = self._request(status)
         t_postdata = self._get_postdata(t_request)
-    
+
         t_opener = urllib2.OpenerDirector()
         t_opener.add_handler(urllib2.HTTPSHandler())
 
@@ -75,5 +75,5 @@ class Twitter:
 
 if __name__ == '__main__':
     t = Twitter('HadoopSO')
-    t.tweet("this is a sample tweet message!!")
+    t.tweet("this is a sample tweet message for hadoop!!")
 

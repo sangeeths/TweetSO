@@ -10,7 +10,9 @@ class StackExchange:
         self._pagesize = pagesize
         self._order = order
         self._sort = sort
-        self._tagged = tagged
+        # TODO: find a nice way of converting # into %23 for c#
+        if tagged == 'c#':  self._tagged = 'c%23' 
+        else: self._tagged = tagged
         self._site = site
         self._filter = qfilter
 
@@ -39,9 +41,6 @@ class StackExchange:
         return result
 
     def _get_url(self, url, **kwargs):
-        # Hack! 
-        if kwargs['tagged'] == 'c#':
-            kwargs['tagged'] = 'c%23'
         url += 'page=%d&'     % self._page     if 'page'     not in kwargs else 'page=%d&'     % kwargs['page']
         url += 'pagesize=%d&' % self._pagesize if 'pagesize' not in kwargs else 'pagesize=%d&' % kwargs['pagesize']
         if 'fromdate' in kwargs: url += 'fromdate=%d&' % kwargs['fromdate']
@@ -50,7 +49,11 @@ class StackExchange:
         if 'minval' in kwargs: url += 'min=%d&' % kwargs['minval']
         if 'maxval' in kwargs: url += 'max=%d&' % kwargs['maxval']
         url += 'sort=%s&'     % self._sort   if 'sort'   not in kwargs else 'sort=%s&'   % kwargs['sort']
-        url += 'tagged=%s&'   % self._tagged if 'tagged' not in kwargs else 'tagged=%s&' % kwargs['tagged']
+        # Hack! - only for tagged is c#
+        # TODO: find out how to replace # to %23 in a good way
+        if 'tagged' not in kwargs:      url += 'tagged=%s&' % self._tagged
+        elif kwargs['tagged'] == 'c#':  url += 'tagged=c%23&'
+        else:                           url += 'tagged=%s&' % kwargs['tagged']
         url += 'site=%s&'     % self._site   if 'site'   not in kwargs else 'site=%s&'   % kwargs['site']
         url += 'filter=%s'    % self._filter if 'filter' not in kwargs else 'filter=%s'  % kwargs['filter']
         #print "StackExchange: _get_url: url: %s" % url 
@@ -73,8 +76,8 @@ class StackExchange:
 
 if __name__ == '__main__':
     se = StackExchange()
-    print se.get_unanswered_questions(pagesize=10, site='stackoverflow', tagged='javascript', fromdate=1362096000, todate=1362873600)
-    #print se.get_unanswered_questions(tagged='c#')
+#    print se.get_unanswered_questions(pagesize=10, site='stackoverflow', tagged='javascript', fromdate=1362096000, todate=1362873600)
+    print se.get_unanswered_questions(tagged='c#')
 #    print se.get_noanswered_questions(page=2, fromdate=1362096000, todate=1362873600)
 #    print se.get_unanswered_questions()
 #    print se.get_noanswered_questions()
