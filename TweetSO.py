@@ -127,7 +127,7 @@ def TweetFeaturedCSharpQuestions():
 # ================== HadoopSO =================
 # Interval : 6-hours
 # Tweets : 15-tweets/6-hours (max: 60-tweets/day)
-@scheduler.cron_schedule(hour='1,7,13,19', minute='2')
+@scheduler.cron_schedule(hour='1,7,13,19', minute='30')
 def TweetUnAnsweredHadoopQuestions():
     s = StackExchange()
     todate = int(time.time())
