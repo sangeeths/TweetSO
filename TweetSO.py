@@ -2,6 +2,7 @@ from apscheduler.scheduler import Scheduler
 from datetime import datetime
 import inspect
 import logging
+import time
 
 from stackexchange import StackExchange
 from twitter import Twitter
@@ -32,65 +33,149 @@ def _tweet(handle, questions, prefix=None):
                 (handle, len(questions), prefix))
     return len(questions)
 
-@scheduler.cron_schedule(hour='0,4,8,12,16,20')
+# =============== CStackOverflow ===============
+# Interval : 6-hours
+# Tweets : 15-tweets/6-hours (max: 60-tweets/day)
+@scheduler.cron_schedule(hour='0,6,12,18')
 def TweetUnAnsweredCQuestions():
     s = StackExchange()
-    questions = s.get_unanswered_questions(tagged='c')
+    todate = int(time.time())
+    fromdate = todate - 7200    # last 2-hours
+    questions = s.get_noanswered_questions(tagged='c',
+                                           fromdate=fromdate,
+                                           todate=todate,
+                                           pagesize=15)
     _tweet('CStackOverflow', questions, 'unanswered')
 
-@scheduler.cron_schedule(hour='0,4,8,12,16,20')
+# Interval : Once in a day @ 10:00 am
+# Tweets : 15-tweets/day (max)
+@scheduler.cron_schedule(hour='10')
 def TweetFeaturedCQuestions():
     s = StackExchange()
-    questions = s.get_featured_questions(tagged='c')
+# NOTE: for now, do not provide fromdate and todate
+#       for featured question on 'C'; Low traffic
+#    todate = int(time.time())
+#    fromdate = todate - 86400       # last 24-hours
+    questions = s.get_featured_questions(tagged='c',
+#                                         fromdate=fromdate,
+#                                         todate=todate,
+                                         pagesize=15)
     _tweet('CStackOverflow', questions, 'featured')
+# =============================================
 
-@scheduler.cron_schedule(hour='1,5,9,13,17,21')
+
+# =================== CppSO ===================
+# Interval : 6-hours
+# Tweets : 15-tweets/6-hours (max: 60-tweets/day)
+@scheduler.cron_schedule(hour='2,8,14,20')
 def TweetUnAnsweredCppQuestions():
     s = StackExchange()
-    questions = s.get_unanswered_questions(tagged='c++')
+    todate = int(time.time())
+    fromdate = todate - 7200    # last 2-hours
+    questions = s.get_noanswered_questions(tagged='c++',
+                                           fromdate=fromdate,
+                                           todate=todate,
+                                           pagesize=15)
     _tweet('CppSO', questions, 'unanswered')
 
-@scheduler.cron_schedule(hour='1,5,9,13,17,21')
+# Interval : Once in a day @ 11:00 am
+# Tweets : 15-tweets/day (max)
+@scheduler.cron_schedule(hour='11')
 def TweetFeaturedCppQuestions():
     s = StackExchange()
-    questions = s.get_featured_questions(tagged='c++')
+# NOTE: for now, do not provide fromdate and todate
+#       for featured question on 'C++'; Low traffic
+#    todate = int(time.time())
+#    fromdate = todate - 86400       # last 24-hours
+    questions = s.get_featured_questions(tagged='c++',
+#                                         fromdate=fromdate,
+#                                         todate=todate,
+                                         pagesize=15)
     _tweet('CppSO', questions, 'featured')
+# =============================================
 
-@scheduler.cron_schedule(hour='2,6,10,14,18,22', minute='35')
+
+# ================== CSharpSO =================
+# Interval : 6-hours
+# Tweets : 15-tweets/6-hours (max: 60-tweets/day)
+@scheduler.cron_schedule(hour='3,9,15,21')
 def TweetUnAnsweredCSharpQuestions():
     s = StackExchange()
-    questions = s.get_unanswered_questions(tagged='c#')
+    todate = int(time.time())
+    fromdate = todate - 7200    # last 2-hours
+    questions = s.get_noanswered_questions(tagged='c#',
+                                           fromdate=fromdate,
+                                           todate=todate,
+                                           pagesize=15)
     _tweet('CSharpSO', questions, 'unanswered')
 
-@scheduler.cron_schedule(hour='2,6,10,14,18,22', minute='35')
+# Interval : Once in a day @ 09:00 am
+# Tweets : 15-tweets/day (max)
+@scheduler.cron_schedule(hour='9')
 def TweetFeaturedCSharpQuestions():
     s = StackExchange()
-    questions = s.get_featured_questions(tagged='c#')
+    todate = int(time.time())
+    fromdate = todate - 86400       # last 24-hours
+    questions = s.get_featured_questions(tagged='c#',
+                                         fromdate=fromdate,
+                                         todate=todate,
+                                         pagesize=15)
     _tweet('CSharpSO', questions, 'featured')
+# =============================================
 
-@scheduler.cron_schedule(hour='3,7,11,15,19,23', minute='6')
+
+# ================== HadoopSO =================
+# Interval : 6-hours
+# Tweets : 15-tweets/6-hours (max: 60-tweets/day)
+@scheduler.cron_schedule(hour='1,7,13,19', minute='2')
 def TweetUnAnsweredHadoopQuestions():
     s = StackExchange()
-    questions = s.get_unanswered_questions(tagged='hadoop')
+    todate = int(time.time())
+    fromdate = todate - 21600   # last 6-hours
+    questions = s.get_noanswered_questions(tagged='hadoop',
+                                           fromdate=fromdate,
+                                           todate=todate,
+                                           pagesize=15)
     _tweet('HadoopSO', questions, 'unanswered')
 
-@scheduler.cron_schedule(hour='3,7,11,15,19,23', minute='6')
+# Interval : Twice in a day @ 08:00 and 16:00 hours
+# Tweets : 30-tweets/day (max) ; Very low traffic
+@scheduler.cron_schedule(hour='8,16')
 def TweetFeaturedHadoopQuestions():
     s = StackExchange()
-    questions = s.get_featured_questions(tagged='hadoop')
+    questions = s.get_featured_questions(tagged='hadoop',
+                                         pagesize=15)
     _tweet('HadoopSO', questions, 'featured')
+# =============================================
 
-@scheduler.cron_schedule(hour='4,8,12,16,20,24')
+
+# ================ SOJavaScript ===============
+# Interval : 4-hours
+# Tweets : 15-tweets/4-hours (max: 90-tweets/day)
+@scheduler.cron_schedule(hour='0,4,8,12,16,20')
 def TweetUnAnsweredJavaScriptQuestions():
     s = StackExchange()
-    questions = s.get_unanswered_questions(tagged='javascript')
+    todate = int(time.time())
+    fromdate = todate - 1200        # last 1-hour
+    questions = s.get_noanswered_questions(tagged='javascript',
+                                           fromdate=fromdate,
+                                           todate=todate,
+                                           pagesize=15)
     _tweet('SOJavaScript', questions, 'unanswered')
 
-@scheduler.cron_schedule(hour='4,8,12,16,20,24')
+# Interval : Thrice in a day @ 07:00, 15:00 and 23:00 hours
+# Tweets : 45-tweets/day (max)
+@scheduler.cron_schedule(hour='7,15,23')
 def TweetFeaturedJavaScriptQuestions():
     s = StackExchange()
-    questions = s.get_featured_questions(tagged='javascript')
+    todate = int(time.time())
+    fromdate = todate - 28800       # last 8-hours
+    questions = s.get_featured_questions(tagged='javascript',
+                                         fromdate=fromdate,
+                                         todate=todate,
+                                         pagesize=15)
     _tweet('SOJavaScript', questions, 'featured')
+# =============================================
 
 
 print('Press Ctrl+C to exit')
@@ -100,3 +185,4 @@ except (KeyboardInterrupt, SystemExit):
     pass
 
 
+# __END__
