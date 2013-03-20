@@ -13,14 +13,15 @@ logging.basicConfig(filename='/tmp/TweetSO.log',
 
 scheduler = Scheduler(standalone=True)
 
-def _tweet(handle, questions, prefix=None):
-    _title_max = 100
+def _tweet(handle, questions, prefix=None, *suffix):
+    _title_max = 65
     if handle is None:
         logging.error("No twitter handle!!")
         return -1
     t = Twitter(handle)
     for q in questions:
         status = ""
+        # Add prefix: [featured]/[unanswered]
         if prefix is not None:
             status += "[%s] " % prefix
         if len(q['title']) > _title_max:
@@ -28,6 +29,10 @@ def _tweet(handle, questions, prefix=None):
         else:
             status += "%s " % q['title']
         status += q['link']
+        # NOTE: the suffix is a hashtag!
+        for item in suffix:
+            status += " #%s" % item
+        logging.info("Tweet:[[%s]] length:[[%d]]" % (status, len(status)))
         t.tweet(status)
     logging.info("%s tweeted %d questions [prefix=%s]" % \
                 (handle, len(questions), prefix))
@@ -45,7 +50,8 @@ def TweetUnAnsweredCQuestions():
                                            fromdate=fromdate,
                                            todate=todate,
                                            pagesize=15)
-    _tweet('CStackOverflow', questions, 'unanswered')
+    _tweet('CStackOverflow', questions,
+           'unanswered', 'C', 'StackOverflow')
 
 # Interval : Once in a day @ 10:00 am
 # Tweets : 15-tweets/day (max)
@@ -60,7 +66,8 @@ def TweetFeaturedCQuestions():
 #                                         fromdate=fromdate,
 #                                         todate=todate,
                                          pagesize=15)
-    _tweet('CStackOverflow', questions, 'featured')
+    _tweet('CStackOverflow', questions,
+           'featured', 'C', 'StackOverflow')
 # =============================================
 
 
@@ -76,7 +83,8 @@ def TweetUnAnsweredCppQuestions():
                                            fromdate=fromdate,
                                            todate=todate,
                                            pagesize=15)
-    _tweet('CppSO', questions, 'unanswered')
+    _tweet('CppSO', questions, 'unanswered',
+           'Cpp', 'StackOverflow')
 
 # Interval : Once in a day @ 11:00 am
 # Tweets : 15-tweets/day (max)
@@ -91,7 +99,8 @@ def TweetFeaturedCppQuestions():
 #                                         fromdate=fromdate,
 #                                         todate=todate,
                                          pagesize=15)
-    _tweet('CppSO', questions, 'featured')
+    _tweet('CppSO', questions, 'featured',
+           'Cpp', 'StackOverflow')
 # =============================================
 
 
@@ -107,7 +116,8 @@ def TweetUnAnsweredCSharpQuestions():
                                            fromdate=fromdate,
                                            todate=todate,
                                            pagesize=15)
-    _tweet('CSharpSO', questions, 'unanswered')
+    _tweet('CSharpSO', questions, 'unanswered',
+           'CSharp', 'StackOverflow')
 
 # Interval : Once in a day @ 09:00 am
 # Tweets : 15-tweets/day (max)
@@ -120,7 +130,8 @@ def TweetFeaturedCSharpQuestions():
                                          fromdate=fromdate,
                                          todate=todate,
                                          pagesize=15)
-    _tweet('CSharpSO', questions, 'featured')
+    _tweet('CSharpSO', questions, 'featured',
+           'CSharp', 'StackOverflow')
 # =============================================
 
 
@@ -136,7 +147,8 @@ def TweetUnAnsweredHadoopQuestions():
                                            fromdate=fromdate,
                                            todate=todate,
                                            pagesize=15)
-    _tweet('HadoopSO', questions, 'unanswered')
+    _tweet('HadoopSO', questions, 'unanswered',
+           'Hadoop', 'StackOverflow')
 
 # Interval : Twice in a day @ 08:00 and 16:00 hours
 # Tweets : 30-tweets/day (max) ; Very low traffic
@@ -145,7 +157,8 @@ def TweetFeaturedHadoopQuestions():
     s = StackExchange()
     questions = s.get_featured_questions(tagged='hadoop',
                                          pagesize=15)
-    _tweet('HadoopSO', questions, 'featured')
+    _tweet('HadoopSO', questions, 'featured',
+           'Hadoop', 'StackOverflow')
 # =============================================
 
 
@@ -161,7 +174,8 @@ def TweetUnAnsweredJavaScriptQuestions():
                                            fromdate=fromdate,
                                            todate=todate,
                                            pagesize=15)
-    _tweet('SOJavaScript', questions, 'unanswered')
+    _tweet('SOJavaScript', questions, 'unanswered',
+           'JavaScript', 'StackOverflow')
 
 # Interval : Thrice in a day @ 07:00, 15:00 and 23:00 hours
 # Tweets : 45-tweets/day (max)
@@ -174,7 +188,8 @@ def TweetFeaturedJavaScriptQuestions():
                                          fromdate=fromdate,
                                          todate=todate,
                                          pagesize=15)
-    _tweet('SOJavaScript', questions, 'featured')
+    _tweet('SOJavaScript', questions, 'featured',
+           'JavaScript', 'StackOverflow')
 # =============================================
 
 
